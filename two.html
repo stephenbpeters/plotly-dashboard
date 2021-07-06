@@ -1,0 +1,77 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" path1tent=
+        "width=device-width,  
+        initial-scale=1.0" />
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+  
+<body>
+<h1>tired of reload not pulling new javascript</h1>
+<h2>... in-line javascript loads the json fine without complain, open console</h2>
+<div id="barDiv"></div>
+    <script>
+
+function unpack(rows, index) {
+  return rows.map(function(row) {
+    return row[index];
+  });
+}
+
+var url = "./samples.json";
+function buildPlot() {
+	d3.json(url, function (data) {
+		console.log(data);
+		// get values
+	    var info = data.samples[0];
+	    console.log("show info = data.samples[0] gets first sample id = 940");
+	    console.log(info);
+	    
+	    var info3 = data.samples[0].otu_ids;
+	    console.log('otu_ids in first item of data.samples info3 = ');
+	    console.log(info3);
+	    var info5 = data.samples[0].sample_values;
+	    console.log('sample_values in first item of data.samples info5 = ');
+	    console.log(info5);
+	    var info6 = data.samples[0].otu_labels;
+	    console.log('otu_labels in first item of data.samples info6 = ');
+	    console.log(info6);
+	    // sort the sample_values descending and slice out the top 10
+	    var sortedInfo5 = info5;
+	    sortedInfo5.sort(function compareFunction(firstNum, secondNum) {
+	    	return secondNum - firstNum;
+	     	});
+	    console.log('here is our sorted data', sortedInfo5);
+	    var slicedInfo5 = sortedInfo5.slice(0, 10);
+	    console.log('here is our sliced data', slicedInfo5); 		
+	    // build the bar char
+	    var plotData = [{
+   		x: info3,
+    	y: slicedInfo5,
+ 		type: 'bar'}];
+		Plotly.newPlot('barDiv', plotData);
+	});
+	console.log('we are here');
+// 	var plotData = [
+//   {
+//     x: info6,
+//     y: info5,
+//     type: 'bar'
+//   }
+// ];
+// 
+// Plotly.newPlot('barDiv', plotData);
+};
+
+buildPlot();
+console.log('showing this thing is on');
+        
+    </script>
+</body>
+  
+</html>
