@@ -34,7 +34,7 @@
 
                 </div>
                 <div id="sample-metadata" class="panel-body">
-                    <ul style="list-style: none; padding-left: 15px;"></ul>
+                    <ul></ul>
                 </div>
             </div>
         </div>
@@ -79,18 +79,6 @@
                 var meta = data.metadata;
                 var filteredMeta = meta.filter(patient => patient.id == selected)[0];
                 // let's build a list we can turn out as list elements
-
-                // console.log('metaList is = ', metaList);
-                // just for now, let's blank out the demo data <ul> list
-                var emptyList = [];
-                d3.select("ul")
-                    .selectAll("li")
-                    .data(emptyList)
-                    .exit()
-                    .remove();
-
-                // and now build the list again
-
                 var metaList = ['ID: ' + filteredMeta.id, 'AGE: ' + filteredMeta.age,
                 'BBTYPE: ' + filteredMeta.bbtype, 'ETHNICITY: ' + filteredMeta.ethnicity,
                 'GENDER: ' + filteredMeta.gender, 'LOCATION: ' + filteredMeta.location,
@@ -103,11 +91,8 @@
                     .enter()
                     .append("li")
                     .html(function (d) {
-                        // return `${d}`;
-                        return d;
+                        return `${d}`;
                     });
-
-
             });
             // console.log('demo area built');
         }
@@ -119,11 +104,8 @@
             // Assign the value of the dropdown menu option to a variable
             var dropVal = dropdownMenu2.property("value");
             // run and build our plot
-            // send dropVal to buildPlot and buildDemo
+            // send dropVal to buildPlot and buildmeta
             buildPlot(dropVal);
-            // seems to me like the line below should refresh our demo div, but it does not.
-            console.log('now call buildDemo');
-            buildDemo(dropVal);
         }
 
         buildDrop();
@@ -139,7 +121,7 @@
                 var otuLabels = filteredData.otu_labels;
                 var sampleValues = filteredData.sample_values;
                 var coolNewlist = [];
-
+                
                 // associating our ID's with our sample values
                 for (let i = 0; i < otuIDs.length; i++) {
                     coolNewlist.push({
@@ -178,29 +160,21 @@
                 var ourLabels = [];
                 sliceList.forEach((value) => {
                     ourX.push(value.sampleValue);
-                    // ourY.push(value.otuID);
-                    ourY.push("OTU " + value.otuID + "  ");
+                    ourY.push(value.otuID);
                     ourLabels.push(value.otuLabel.toString());
                 });
 
                 var plotData = [{
                     x: ourX,
-                    text: ourLabels,
-                    y: ourY,
+                    y: ourLabels,
                     type: 'bar',
                     orientation: 'h'
                 }];
 
-                var barLayout = {
-                    title: 'Top 10 Bacteria Cultures Found',
-                    // height: 600,
-                    width: 1000
-                };
-
-                Plotly.newPlot('barDiv', plotData, barLayout);
+                Plotly.newPlot('barDiv', plotData);
 
                 // time for a new bubble plot that takes the selected individual
-                // let's make up some random colors for the bubbles
+               // let's make up some random colors for the bubbles
                 var colors = [];
                 for (var i = 0; i < 80; i++) {
                     colors[i] = Math.floor(Math.random() * 254)
@@ -209,50 +183,128 @@
 
                 // draw the bubble chart
                 var trace1 = {
-                    // x: ourX,
-                    // y: ourY,
-                    // my variable names are confusing here, as its otu_ids for X
-                    // and sample_values for y, which is reverse of how we create the bar chart
-                    // the below x and y just plot the top 10
-                    // x: ourY,
-                    // y: ourX,
-                    // -----------------
-                    // the next x and y plot all the samples for this individual
-                    x: otuIDs,
-                    y: sampleValues,
+                    x: ourX,
+                    y: ourY,
                     text: ourLabels,
                     mode: 'markers',
                     marker: {
                         size: ourX,
-                        // below line generates random colors
-                        // color: colors
-                        color: otuIDs
+                        color: colors
                     }
                 };
 
                 var dataB = [trace1];
 
                 var layoutB = {
-                    title: 'Bacteria Cultures Per Sample',
+                    title: 'Bubble Chart',
                     showlegend: false,
                     height: 600,
-                    width: 1200,
-                    xaxis: { 
-                        title: {
-                            text: 'OTU ID' }
-                        }
+                    width: 1200
                 };
 
                 Plotly.newPlot('superBubble', dataB, layoutB);
-
-                // let's not forget to draw our demo data area 
-                buildDemo(ourSelection);
 
 
             });
             // console.log('data loaded');
         };
         buildPlot(940);
+
+        // =============================================================
+        // this is the working code that gets a hard-coded sample and
+        // makes a bubble chart in bubble div
+        function buildBubble() {
+            d3.json(url, function (data) {
+                // console.log(data);
+                // get values
+                var dropVal = grabData();
+                // console.log('our dropval is now = ', dropVal);
+                var info = data.samples[0];
+                // console.log("show info = data.samples[0] gets first sample id = 940");
+                // console.log(info);
+
+                var info3 = data.samples[0].otu_ids;
+                // console.log('otu_ids in first item of data.samples info3 = ');
+                // console.log(info3);
+                var info5 = data.samples[0].sample_values;
+                // console.log('sample_values in first item of data.samples info5 = ');
+                // console.log(info5);
+                var info6 = data.samples[0].otu_labels;
+                // console.log('otu_labels in first item of data.samples info6 = ');
+                // console.log(info6);
+                // sort the sample_values descending and slice out the top 10
+                var sortedInfo5 = info5;
+                sortedInfo5.sort(function compareFunction(firstNum, secondNum) {
+                    return secondNum - firstNum;
+                });
+                // console.log('here is our sorted data', sortedInfo5);
+                var slicedInfo5 = sortedInfo5.slice(0, 10);
+                // console.log('here is our sliced data', slicedInfo5);
+
+                // // well, can we make the dropdown do a thing?
+                // var fruits = ['apple', 'mango', 'banana', 'orange'];
+                // d3.select('select')
+                //     .selectAll('option')
+                //     .data(slicedInfo5)
+                //     .enter()
+                //     .append('option')
+                //     .text(function (d) { return d; });
+                // // end of dropdown	    
+
+                // now we must sort the other two things by same index as the first to get the
+                // matching data
+
+                // build the bar chart
+                var plotData = [{
+                    x: info3,
+                    y: slicedInfo5,
+                    type: 'bar',
+                    orientation: 'h'
+                }];
+                // turn off the plot
+                // Plotly.newPlot('barDiv', plotData);
+
+                // bubble chart plot time
+                // hover labels and colors not working right
+                // let's see if we can make a colors array from https://www.codecademy.com/forum_questions/50c207bd55df51ff27004775
+                var colors = [];
+                for (var i = 0; i < 80; i++) {
+                    //			colors[i] = (i + 1000 +(i*300));
+                    colors[i] = Math.floor(Math.random() * 254)
+                }
+                // console.log(colors);
+                // draw bubble chart
+                var trace1 = {
+                    x: info3,
+                    y: info5,
+                    text: info6,
+                    mode: 'markers',
+                    marker: {
+                        size: info5,
+                        color: colors
+                    }
+                };
+
+                var dataB = [trace1];
+
+                var layoutB = {
+                    title: 'Bubble Chart',
+                    showlegend: false,
+                    height: 600,
+                    width: 1200
+                };
+                // turn off the hard-coded bubble plot for now    
+                // Plotly.newPlot('bubbleDiv', dataB, layoutB);
+
+            });
+            console.log('we are here');
+            // console.log("check if we got dropVal: ", dropVal);
+        };
+        buildBubble();
+
+
+
+
     </script>
 </body>
 
