@@ -78,24 +78,16 @@
                 // let's not forget to filter to what we want to show to our one person
                 var meta = data.metadata;
                 var filteredMeta = meta.filter(patient => patient.id == selected)[0];
+                
                 // let's build a list we can turn out as list elements
-
-                // console.log('metaList is = ', metaList);
-                // just for now, let's blank out the demo data <ul> list
-                var emptyList = [];
-                d3.select("ul")
-                    .selectAll("li")
-                    .data(emptyList)
-                    .exit()
-                    .remove();
-
-                // and now build the list again
-
+                
                 var metaList = ['ID: ' + filteredMeta.id, 'AGE: ' + filteredMeta.age,
                 'BBTYPE: ' + filteredMeta.bbtype, 'ETHNICITY: ' + filteredMeta.ethnicity,
                 'GENDER: ' + filteredMeta.gender, 'LOCATION: ' + filteredMeta.location,
                 'WFREQ: ' + filteredMeta.wfreq
                 ];
+
+                d3.select("#sample-metadata").html('<ul style="list-style: none; padding-left: 15px;"></ul>')
 
                 d3.select("ul")
                     .selectAll("li")
@@ -159,18 +151,12 @@
                     return 0;
                 });
                 // now we have our list sorted, printed in reverse below, slice out the 10
-                // console.log("our sorted cool new list = ",coolNewlist.reverse().slice(0,10));
-                // console.log("our sorted cool new list = ", coolNewlist);
                 // looks like we may need to put this into a new list for it to work
                 // var sliceList = coolNewlist.reverse().slice(0,10);
                 var sortList = coolNewlist.reverse();
                 // console.log("sortList = ", sortList);
                 var sliceList = sortList.slice(0, 10);
                 // console.log("sliceList = ", sliceList);
-                // can we get directly to the proper sort & slice?
-                // nope, the following two lines do not sort 'n' slice properly
-                // var sliced2list =  coolNewlist.reverse().slice(0,10);
-                // console.log("sliced2list = ", sliced2list);
 
                 // ok, now we get our properly sorted data into our things to plot
                 var ourX = [];
@@ -209,13 +195,9 @@
 
                 // draw the bubble chart
                 var trace1 = {
-                    // x: ourX,
-                    // y: ourY,
                     // my variable names are confusing here, as its otu_ids for X
                     // and sample_values for y, which is reverse of how we create the bar chart
                     // the below x and y just plot the top 10
-                    // x: ourY,
-                    // y: ourX,
                     // -----------------
                     // the next x and y plot all the samples for this individual
                     x: otuIDs,
